@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------------
+# Vörðr
+# Git Attributes
+# -----------------------------------------------------------------------------
+
+# Normalize text files to LF in the repository
+* text=auto eol=lf
+
+# Source files
+*.ts      text
+*.tsx     text
+*.js      text
+*.jsx     text
+*.json    text
+*.md      text
+*.yml     text
+*.yaml    text
+*.html    text
+*.css     text
+*.scss    text
+*.sh      text
+
+# Windows scripts
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+# Binary assets
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.ico     binary
+*.pdf     binary
+*.zip     binary
+*.gz      binary
+*.sqlite  binary
+*.db      binary
