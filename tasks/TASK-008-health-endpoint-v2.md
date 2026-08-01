@@ -1,63 +1,39 @@
 # TASK-008 — Health Endpoint v2
 
-**Task ID:** TASK-008
-**Sprint:** Sprint 0 — Foundation
-**Release:** v0.1 Foundation
-**Priority:** Low
-**Estimated Effort:** XS
-
----
-
-## Status
-
-Planned
-
----
-
 ## Goal
 
-Enhance the existing health endpoint with additional runtime information.
+Improve the existing health endpoint by exposing basic application metadata.
 
-The endpoint should remain lightweight while becoming more useful for diagnostics and monitoring.
+The endpoint should remain lightweight while becoming more useful for monitoring, debugging and future deployment checks.
 
 ---
 
 ## Requirements
 
-Extend GET /health to include:
+- Keep the existing `/health` endpoint.
+- Return HTTP 200.
+- Return JSON in the following format:
 
-- status
-- version
-- uptime
-- timestamp
-- node version
+{
+  "status": "ok",
+  "version": "0.1.0"
+}
 
-The endpoint must continue returning HTTP 200.
+- The version value must come from a single constant.
+- Do not hardcode the version in the route handler.
+- Do not add any dependencies.
 
 ---
 
 ## Acceptance Criteria
 
-- Health endpoint returns the additional fields.
-- Application starts successfully.
-- pnpm typecheck succeeds.
-- Response remains valid JSON.
-
----
-
-## Out of Scope
-
-This task must not:
-
-- add database health checks
-- expose sensitive information
-- add metrics endpoints
-
----
-
-## Implementation Notes
-
-The endpoint should remain suitable for future health checks used by Docker, reverse proxies, and monitoring systems.
+- [ ] `/health` returns HTTP 200
+- [ ] Response contains:
+      - status
+      - version
+- [ ] Version is defined in a single location
+- [ ] pnpm typecheck passes
+- [ ] pnpm build passes
 
 ---
 
@@ -65,6 +41,5 @@ The endpoint should remain suitable for future health checks used by Docker, rev
 
 - [ ] Requirements implemented
 - [ ] Acceptance criteria verified
-- [ ] TypeScript passes
 - [ ] Documentation updated
 - [ ] Ready for Pull Request

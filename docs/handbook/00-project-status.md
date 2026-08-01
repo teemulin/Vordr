@@ -38,7 +38,7 @@ Complete the repository bootstrap and establish engineering standards.
 - pnpm workspace
 - TypeScript configuration
 - Fastify bootstrap
-- Initial `/health` endpoint
+- Initial `/health` endpoint with status and version metadata
 - Development environment verified
 - Engineering Handbook started
 - AI task workflow introduced
