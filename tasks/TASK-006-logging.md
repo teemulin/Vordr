@@ -1,67 +1,37 @@
 # TASK-006 — Logging
 
-**Task ID:** TASK-006
-**Sprint:** Sprint 0 — Foundation
-**Release:** v0.1 Foundation
-**Priority:** Medium
-**Estimated Effort:** S
-
----
-
-## Status
-
-Planned
-
----
-
 ## Goal
 
-Prepare the project for centralized logging.
+Introduce a dedicated server builder while keeping application startup minimal.
 
-This task establishes a dedicated location for logging configuration without changing application functionality.
+The Fastify application should be created through a `buildServer()` function to prepare the project for future plugins, routes and middleware.
+
+At this stage, continue using Fastify's built-in logger (`logger: true`) without introducing custom logging configuration or additional dependencies.
 
 ---
 
 ## Requirements
 
-Create:
-
-src/server/logger.ts
-
-The logger module should expose a shared logger instance for future use.
-
-Refactor the application to use the shared logger where appropriate.
-
-Existing logging behaviour must remain unchanged.
+- Create `src/server/logger.ts`
+- Create `src/server/app.ts`
+- Expose a `buildServer()` function
+- Move Fastify application creation into `buildServer()`
+- Keep `src/index.ts` responsible only for application startup
+- Continue using Fastify's built-in logger (`logger: true`)
+- Do not add any new dependencies
+- Keep the implementation minimal
 
 ---
 
 ## Acceptance Criteria
 
-- Logger module exists.
-- Project builds successfully.
-- pnpm typecheck succeeds.
-- Application starts normally.
-- Existing log output continues to work.
-
----
-
-## Out of Scope
-
-This task must not:
-
-- customize log formatting
-- write logs to files
-- introduce log transports
-- modify log levels
-
----
-
-## Implementation Notes
-
-This task only prepares the logging architecture.
-
-Future tasks will extend the logger configuration.
+- [ ] `src/server/logger.ts` created
+- [ ] `src/server/app.ts` created
+- [ ] Fastify instance created via `buildServer()`
+- [ ] `src/index.ts` only starts the application
+- [ ] `/health` endpoint continues to return HTTP 200
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm build` passes
 
 ---
 
@@ -70,5 +40,6 @@ Future tasks will extend the logger configuration.
 - [ ] Requirements implemented
 - [ ] Acceptance criteria verified
 - [ ] TypeScript passes
+- [ ] Lint passes
 - [ ] Documentation updated
 - [ ] Ready for Pull Request
