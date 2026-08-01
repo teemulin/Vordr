@@ -1,68 +1,42 @@
 # TASK-007 — Error Handling
 
-**Task ID:** TASK-007
-**Sprint:** Sprint 0 — Foundation
-**Release:** v0.1 Foundation
-**Priority:** Medium
-**Estimated Effort:** S
-
----
-
-## Status
-
-Planned
-
----
-
 ## Goal
 
 Introduce centralized error handling for the Fastify application.
 
-This establishes a consistent foundation for future API development.
+All unhandled server errors should be logged consistently and return a minimal JSON response.
+
+The implementation should remain intentionally simple and prepare the project for future validation and authentication errors.
 
 ---
 
 ## Requirements
 
-Implement:
+- Register a global Fastify error handler.
+- Keep existing startup error handling unchanged.
+- Log all unexpected errors using Fastify's logger.
+- Return HTTP 500.
+- Return the following JSON response:
 
-- global error handler
-- not found handler
+{
+  "error": "Internal Server Error"
+}
 
-Unexpected errors should:
-
-- be logged
-- return a consistent JSON response
-
-404 responses should also return JSON.
+- Do not expose stack traces.
+- Do not introduce custom error classes.
+- Do not add any dependencies.
 
 ---
 
 ## Acceptance Criteria
 
-- Global error handler exists.
-- Not found handler exists.
-- Server starts successfully.
-- Existing endpoints continue working.
-- pnpm typecheck succeeds.
-
----
-
-## Out of Scope
-
-This task must not:
-
-- introduce custom error classes
-- implement authentication errors
-- modify business logic
-
----
-
-## Implementation Notes
-
-Keep error responses minimal.
-
-Advanced error handling will be implemented later.
+- [ ] Global error handler registered
+- [ ] Unexpected errors return HTTP 500
+- [ ] Response body is:
+      { "error": "Internal Server Error" }
+- [ ] Errors are logged
+- [ ] pnpm typecheck passes
+- [ ] pnpm build passes
 
 ---
 
@@ -70,6 +44,5 @@ Advanced error handling will be implemented later.
 
 - [ ] Requirements implemented
 - [ ] Acceptance criteria verified
-- [ ] TypeScript passes
 - [ ] Documentation updated
 - [ ] Ready for Pull Request
