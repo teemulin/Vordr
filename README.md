@@ -34,6 +34,21 @@ The project is currently under active development.
 - Playwright
 - GitHub Actions
 
+## Development
+
+Run the complete type check and production build with:
+
+```sh
+pnpm typecheck
+pnpm build
+```
+
+The frontend lives in `apps/web`. Start its Vite development server with:
+
+```sh
+pnpm --filter @vordr/web dev
+```
+
 ## 📚 Documentation
 
 Project documentation is located in the `docs/` directory.
