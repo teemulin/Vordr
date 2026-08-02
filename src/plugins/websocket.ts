@@ -1,22 +1,14 @@
 import websocket from "@fastify/websocket";
 import type { FastifyPluginAsync } from "fastify";
 import { APP_VERSION } from "../config/app.js";
-
-interface ClientMessage {
-  readonly type: string;
-}
-
-type ServerMessage =
-  | { readonly type: "hello"; readonly version: string }
-  | { readonly type: "pong" }
-  | { readonly type: "error"; readonly message: "Unknown message type" };
+import type { ClientMessage, ServerMessage } from "../protocol/websocket.js";
 
 function isClientMessage(value: unknown): value is ClientMessage {
   return (
     typeof value === "object" &&
     value !== null &&
     "type" in value &&
-    typeof value.type === "string"
+    (value.type === "hello" || value.type === "ping")
   );
 }
 
@@ -37,14 +29,11 @@ function parseMessage(data: unknown): unknown {
 }
 
 function createResponse(message: ClientMessage): ServerMessage {
-  switch (message.type) {
-    case "hello":
-      return { type: "hello", version: APP_VERSION };
-    case "ping":
-      return { type: "pong" };
-    default:
-      return { type: "error", message: "Unknown message type" };
+  if (message.type === "hello") {
+    return { type: "hello", version: APP_VERSION };
   }
+
+  return { type: "pong" };
 }
 
 export const websocketPlugin: FastifyPluginAsync = async (app) => {
