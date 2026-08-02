@@ -1,5 +1,6 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { APP_VERSION } from "../config/app.js";
+import { websocketPlugin } from "../plugins/websocket.js";
 import { loggerOptions } from "./logger.js";
 
 export function buildServer(): FastifyInstance {
@@ -10,6 +11,8 @@ export function buildServer(): FastifyInstance {
 
     return reply.status(500).send({ error: "Internal Server Error" });
   });
+
+  app.register(websocketPlugin);
 
   app.get("/health", async () => ({ status: "ok", version: APP_VERSION }));
 
