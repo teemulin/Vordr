@@ -49,6 +49,19 @@ The frontend lives in `apps/web`. Start its Vite development server with:
 pnpm --filter @vordr/web dev
 ```
 
+## WebSocket protocol
+
+The server exposes a WebSocket endpoint at `/ws`. Messages are JSON objects with
+a `type` field. The current protocol supports:
+
+| Client message | Server response |
+| --- | --- |
+| `{ "type": "hello" }` | `{ "type": "hello", "version": "0.1.0" }` |
+| `{ "type": "ping" }` | `{ "type": "pong" }` |
+
+Unknown message types receive `{ "type": "error", "message": "Unknown message type" }`.
+Invalid JSON closes the connection.
+
 ## 📚 Documentation
 
 Project documentation is located in the `docs/` directory.
