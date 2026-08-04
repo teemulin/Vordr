@@ -17,7 +17,7 @@ The project emphasizes modern software engineering practices, security by defaul
 
 ## 🚧 Project Status
 
-**Current milestone:** Sprint 0 – Repository Bootstrap
+**Current milestone:** Sprint 1 – Walking-skeleton
 
 The project is currently under active development.
 
@@ -29,7 +29,7 @@ The project is currently under active development.
 - WebRTC
 - Vite
 - pnpm
-- Docker
+- Docker (planned)
 - Vitest
 - Playwright
 - GitHub Actions
