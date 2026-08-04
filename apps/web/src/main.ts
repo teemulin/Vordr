@@ -16,14 +16,18 @@ app.innerHTML = `
     <section aria-label="Camera preview">
       <video autoplay playsinline></video>
     </section>
+    <section aria-label="Remote preview">
+      <video autoplay playsinline></video>
+    </section>
   </main>
 `;
 
 const startCameraButton = app.querySelector<HTMLButtonElement>('button[type="button"]');
-const previewVideo = app.querySelector<HTMLVideoElement>("video");
+const localPreviewVideo = app.querySelector<HTMLVideoElement>('section[aria-label="Camera preview"] video');
+const remotePreviewVideo = app.querySelector<HTMLVideoElement>('section[aria-label="Remote preview"] video');
 const statusMessage = app.querySelector<HTMLParagraphElement>('p[role="status"]');
 
-if (startCameraButton === null || previewVideo === null || statusMessage === null) {
+if (startCameraButton === null || localPreviewVideo === null || remotePreviewVideo === null || statusMessage === null) {
   throw new Error("Missing required UI elements");
 }
 
@@ -31,8 +35,31 @@ const setStatusMessage = (message: string): void => {
   statusMessage.textContent = message;
 };
 
+const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const websocketUrl = `${protocol}//${window.location.host}/ws`;
+const signalingSocket = new WebSocket(websocketUrl);
+const peerConnection = new RTCPeerConnection();
+let localCameraStream: MediaStream | null = null;
+let canCreateOffer = false;
+let isCreatingOffer = false;
+let isDataChannelCreated = false;
+
+const attachLocalVideoTracks = (stream: MediaStream): void => {
+  for (const track of stream.getVideoTracks()) {
+    const trackAlreadyAdded = peerConnection
+      .getSenders()
+      .some((sender) => sender.track?.id === track.id);
+
+    if (trackAlreadyAdded) {
+      continue;
+    }
+
+    peerConnection.addTrack(track, stream);
+  }
+};
+
 const startCamera = async (): Promise<void> => {
-  if (previewVideo.srcObject instanceof MediaStream) {
+  if (localPreviewVideo.srcObject instanceof MediaStream) {
     return;
   }
 
@@ -48,7 +75,10 @@ const startCamera = async (): Promise<void> => {
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    previewVideo.srcObject = stream;
+    localCameraStream = stream;
+    localPreviewVideo.srcObject = stream;
+    attachLocalVideoTracks(stream);
+    void createOffer();
   } catch (error: unknown) {
     if (error instanceof DOMException && error.name === "NotAllowedError") {
       setStatusMessage("Camera permission was denied.");
@@ -67,13 +97,6 @@ const startCamera = async (): Promise<void> => {
 startCameraButton.addEventListener("click", () => {
   void startCamera();
 });
-
-const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const websocketUrl = `${protocol}//${window.location.host}/ws`;
-const signalingSocket = new WebSocket(websocketUrl);
-const peerConnection = new RTCPeerConnection();
-let isOfferCreated = false;
-let isDataChannelCreated = false;
 
 function isServerMessage(value: unknown): value is ServerMessage {
   if (typeof value !== "object" || value === null || !("type" in value)) {
@@ -135,25 +158,36 @@ const ensureDataChannel = (): void => {
 };
 
 const createOffer = async (): Promise<void> => {
-  if (isOfferCreated || peerConnection.signalingState !== "stable") {
+  if (!canCreateOffer || isCreatingOffer || peerConnection.signalingState !== "stable") {
     return;
   }
 
-  isOfferCreated = true;
-  ensureDataChannel();
+  isCreatingOffer = true;
 
-  const offer = await peerConnection.createOffer();
-  await peerConnection.setLocalDescription(offer);
+  try {
+    ensureDataChannel();
 
-  if (peerConnection.localDescription === null || peerConnection.localDescription.sdp === null) {
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    if (peerConnection.localDescription === null || peerConnection.localDescription.sdp === null) {
+      setStatusMessage("Unable to create SDP offer.");
+      return;
+    }
+
+    sendSignalingMessage({ type: "offer", sdp: peerConnection.localDescription.sdp });
+  } catch {
     setStatusMessage("Unable to create SDP offer.");
-    return;
+  } finally {
+    isCreatingOffer = false;
   }
-
-  sendSignalingMessage({ type: "offer", sdp: peerConnection.localDescription.sdp });
 };
 
 const handleOffer = async (sdp: string): Promise<void> => {
+  if (localCameraStream !== null) {
+    attachLocalVideoTracks(localCameraStream);
+  }
+
   await peerConnection.setRemoteDescription({ type: "offer", sdp });
 
   const answer = await peerConnection.createAnswer();
@@ -194,9 +228,30 @@ peerConnection.addEventListener("icecandidate", (event) => {
   });
 });
 
+peerConnection.addEventListener("track", (event) => {
+  const [stream] = event.streams;
+
+  if (stream) {
+    remotePreviewVideo.srcObject = stream;
+  }
+});
+
+peerConnection.addEventListener("connectionstatechange", () => {
+  if (peerConnection.connectionState === "failed") {
+    setStatusMessage("Peer connection failed.");
+    return;
+  }
+
+  if (peerConnection.connectionState === "disconnected") {
+    setStatusMessage("Peer connection disconnected.");
+  }
+});
+
 const handleSignalingMessage = async (message: ServerMessage): Promise<void> => {
   if (message.type === "hello") {
-    if (message.peerCount >= 2) {
+    canCreateOffer = message.peerCount >= 2;
+
+    if (canCreateOffer) {
       await createOffer();
     }
 
@@ -225,6 +280,14 @@ const handleSignalingMessage = async (message: ServerMessage): Promise<void> => 
 
 signalingSocket.addEventListener("open", () => {
   sendSignalingMessage({ type: "hello" });
+});
+
+signalingSocket.addEventListener("error", () => {
+  setStatusMessage("Signaling connection failed.");
+});
+
+signalingSocket.addEventListener("close", () => {
+  setStatusMessage("Signaling connection closed.");
 });
 
 signalingSocket.addEventListener("message", (event) => {
