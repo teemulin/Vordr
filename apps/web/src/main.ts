@@ -2,8 +2,9 @@ import type { ClientMessage, ServerMessage } from "../../../src/protocol/websock
 
 document.querySelector<HTMLElement>("#app")!.textContent = "Vordr";
 
-const websocket = new WebSocket("ws://localhost:3000/ws");
-
+const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const websocketUrl = `${protocol}//${window.location.host}/ws`;
+const websocket = new WebSocket(websocketUrl);
 websocket.addEventListener("open", () => {
   console.info("WebSocket connection opened");
   const message: ClientMessage = { type: "hello" };
