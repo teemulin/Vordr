@@ -78,7 +78,7 @@ const startCamera = async (): Promise<void> => {
     localCameraStream = stream;
     localPreviewVideo.srcObject = stream;
     attachLocalVideoTracks(stream);
-    void createOffer();
+    sendSignalingMessage({ type: "hello" });
   } catch (error: unknown) {
     if (error instanceof DOMException && error.name === "NotAllowedError") {
       setStatusMessage("Camera permission was denied.");
@@ -251,7 +251,7 @@ const handleSignalingMessage = async (message: ServerMessage): Promise<void> => 
   if (message.type === "hello") {
     canCreateOffer = message.peerCount >= 2;
 
-    if (canCreateOffer) {
+    if (canCreateOffer && localCameraStream !== null) {
       await createOffer();
     }
 
