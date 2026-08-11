@@ -322,6 +322,176 @@ Choose the simplest solution that satisfies the requirements.
 
 ---
 
+# Task Execution Protocol
+
+Tasks are stored locally in the `tasks/` directory.
+
+The `tasks/` directory is intentionally excluded from version control.
+Task specifications are local development artifacts and must not be
+committed to the repository unless explicitly requested.
+
+When the user asks to implement a task by identifier, for example:
+
+Implement TASK-017
+
+the AI assistant MUST follow this workflow.
+
+## 1. Locate the Task
+
+Find the corresponding task specification in:
+
+`tasks/`
+
+Tasks use the naming convention:
+
+`TASK-XXX-short-description.md`
+
+If the requested task cannot be found, do not guess its requirements.
+Ask the user to provide or locate the task specification.
+
+## 2. Read the Task Completely
+
+Read the complete task specification before modifying code.
+
+The task specification defines the intended scope of the implementation.
+
+Pay particular attention to:
+
+- Goal
+- Requirements
+- Constraints
+- Acceptance Criteria
+- Out of Scope
+- Verification
+- Completion Checklist
+
+## 3. Read Relevant Project Context
+
+Before implementation, inspect the repository documentation relevant to
+the task.
+
+Depending on the task, this may include:
+
+- Engineering Handbook
+- Architecture documentation
+- ADRs
+- Roadmap
+- README
+- Existing tests
+- Related implementations
+
+Do not read unrelated documentation merely for the sake of doing so.
+
+## 4. Inspect Existing Implementation
+
+Before making changes:
+
+- inspect the existing code related to the task
+- identify existing patterns and abstractions
+- inspect relevant tests
+- identify dependencies on previous tasks
+- understand the current architecture
+
+Do not assume that functionality needs to be implemented from scratch.
+
+## 5. Respect Task Scope
+
+Implement the requirements defined by the task.
+
+Do not:
+
+- add unrelated features
+- perform unrelated refactoring
+- introduce unnecessary dependencies
+- introduce new architecture without justification
+- implement functionality explicitly marked Out of Scope
+
+If an improvement appears useful but is outside the task scope, mention it
+in the final report instead of implementing it automatically.
+
+## 6. Resolve Conflicts
+
+If the task specification conflicts with:
+
+- `AGENTS.md`
+- the Engineering Handbook
+- architecture documentation
+- an ADR
+- established repository conventions
+
+do not silently choose an interpretation.
+
+Report the conflict before making changes when the conflict affects the
+correct implementation approach.
+
+## 7. Implement
+
+Use the smallest reasonable implementation that satisfies the task.
+
+Prefer:
+
+- existing project patterns
+- existing abstractions
+- minimal dependencies
+- clear and maintainable code
+- consistency with the current architecture
+
+Avoid over-engineering.
+
+## 8. Verify
+
+Before considering the task complete:
+
+- run tests relevant to the task
+- run `pnpm typecheck`
+- run `pnpm build`
+- run `git diff --check`
+- inspect the final `git diff`
+
+If the task specifies additional verification requirements, those must also
+be performed.
+
+Do not claim that a task is complete if required verification fails.
+
+## 9. Final Review
+
+Before reporting completion, verify that:
+
+- all requirements are implemented
+- acceptance criteria are satisfied
+- no unrelated changes were introduced
+- the final diff matches the task scope
+- documentation was updated when required
+
+## 10. Final Report
+
+After implementation, report:
+
+1. What was implemented
+2. Files changed
+3. Important implementation decisions
+4. Verification results
+5. Limitations or unresolved issues
+6. Anything intentionally left out because it was out of scope
+
+The AI assistant must not create a commit unless the user explicitly asks
+for one.
+
+## Task Completion
+
+A task is implementation-complete only when:
+
+- requirements are implemented
+- acceptance criteria are satisfied
+- required verification passes
+- final diff has been reviewed
+- no unrelated changes were introduced
+
+The task specification itself must not be modified merely to make
+implementation appear complete.
+
+---
+
 # Definition of Done
 
 A task is complete only when:
